@@ -39,8 +39,8 @@ infixr 7 .-.
 infixr 8 ///
 
 comp :: Int -> (a -> a) -> a -> a
-comp 0 f a = a
-comp n f a = f (a comp (n-1) f a)
+comp 0 f = f
+comp n f = f . comp (n-1) f
 -- comp -n f a = error
 
 -- Funciones constructoras
@@ -67,20 +67,21 @@ espejar = Espejar
 
 -- Combinadores 
 
+-- Pone el primer dibujo arriba del segundo, el segundo dibujo se ve por encima del primero
 (^^^) :: Dibujo a -> Dibujo a -> Dibujo a
-(^^^) x y = encimar 1 1 x y
+(^^^) = encimar
 
 -- Pone el primer dibujo arriba del segundo, ambos ocupan el mismo espacio
 (.-.) :: Dibujo a -> Dibujo a -> Dibujo a
-(.-.) x y = apilar 1 1 x y
+(.-.) = apilar 1 1
 
 -- Pone un dibujo al lado del otro, ambos ocupan el mismo espacio
 (///) :: Dibujo a -> Dibujo a -> Dibujo a
-(///) x y = juntar 1 1 x y
+(///) = juntar 1 1
 
 -- rotaciones
 r90 :: Dibujo a -> Dibujo a
-r90 x = rotar a
+r90 x = rotar x
 
 r180 :: Dibujo a -> Dibujo a
 r180 x = comp 2 r90 x
@@ -98,9 +99,10 @@ cuarteto x y z w = (///) ((.-.) x y) ((.-.) z w)
 
 -- un cuarteto donde se repite la imagen, rotada (¡No confundir con encimar4!)
 ciclar :: Dibujo a -> Dibujo a
-ciclar = cuarteto x (rotar x) (r180 x) (r270 x)
+ciclar x = cuarteto x (rotar x) (r180 x) (r270 x)
 
 -- map para nuestro lenguaje
+-- matcheamos la funcion x con los constructores de dibujo y aplicamos la funcion.
 mapDib :: (a -> b) -> Dibujo a -> Dibujo b
 mapDib figura x = x
 mapDib f x = case f of
@@ -116,9 +118,10 @@ mapDib f x = case f of
 
 -- Cambiar todas las básicas de acuerdo a la función.
 change :: (a -> Dibujo b) -> Dibujo a -> Dibujo b
-change = undefined
+change f x = mapDib f x
 
 -- Principio de recursión para Dibujos.
+-- matcheamos la funcion x con los constructores de dibujo y aplicamos la funcion.
 foldDib ::
   (a -> b) ->
   (b -> b) ->
@@ -129,4 +132,11 @@ foldDib ::
   (b -> b -> b) ->
   Dibujo a ->
   b
-foldDib = undefined
+foldDib f g h i j k l x = case x of
+  Figura a -> f a
+  Encimar a b -> j (foldDib f g h i j k l a) (foldDib f g h i j k l b)
+  Apilar a b c d -> k a b (foldDib f g h i j k l c) (foldDib f g h i j k l d)
+  Juntar a b c d -> l a b (foldDib f g h i j k l c) (foldDib f g h i j k l d)
+  Rot45 a -> g (foldDib f g h i j k l a)
+  Rotar a -> h (foldDib f g h i j k l a)
+  Espejar a -> i (foldDib f g h i j k l a)

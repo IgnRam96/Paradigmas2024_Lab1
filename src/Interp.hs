@@ -1,6 +1,13 @@
 module Interp
   ( interp,
     initial,
+    ov,
+    r45,
+    rot,
+    esp,
+    sup,
+    jun,
+    api
   )
 where
 
@@ -24,25 +31,35 @@ initial (Conf n dib intBas) size = display win white $ withGrid fig size
 
 -- Interpretación de (^^^)
 ov :: Picture -> Picture -> Picture
-ov p q = undefined
+ov p q = pictures [p, q]
 
 r45 :: FloatingPic -> FloatingPic
-r45 = undefined
+r45 f d w h = f (d V.+ half(w V.+ h)) (half(w V.+ h)) (half(h V.- w))
 
 rot :: FloatingPic -> FloatingPic
-rot = undefined
+rot f d w h = f (d V.+ w) h (zero V.- w)
 
 esp :: FloatingPic -> FloatingPic
-esp = undefined
+esp f d w h = f (d V.+ w) (zero V.- w) h
 
 sup :: FloatingPic -> FloatingPic -> FloatingPic
-sup = undefined
+sup f g d w h = ov (f d w h) (g d w h)
 
 jun :: Float -> Float -> FloatingPic -> FloatingPic -> FloatingPic
-jun = undefined
+jun x y f g d w h = ov (f d w' h) (g (d V.+ w') (r' V.* w) (h))
+  where
+    -- r y r' son factores de escalamiento segun los numeros flotantes x e y, y w' es el vector h escalado
+    r = x / (x + y)
+    r' = y / (x + y)
+    w' = w V.* r
 
 api :: Float -> Float -> FloatingPic -> FloatingPic -> FloatingPic
-api = undefined
+api x y f g d w h = ov (f (d V. + h') w (r V.* h)) (g d w h')
+  where
+    -- r y r' son factores de escalamiento segun los numeros flotantes x e y, y h' es el vector h escalado
+    r = x / (x + y)
+    r' = y / (x + y)
+    h' = h V.* r'
 
 interp :: Output a -> Output (Dibujo a)
-interp b = undefined
+interp f = foldDib f r45 rot esp sup jun api

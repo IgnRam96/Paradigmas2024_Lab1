@@ -1,4 +1,3 @@
-{-# LANGUAGE ExistentialQuantification #-}
 module FloatingPic
   ( FloatingPic,
     Output,
