@@ -81,13 +81,13 @@ espejar = Espejar
 
 -- rotaciones
 r90 :: Dibujo a -> Dibujo a
-r90 x = rotar x
+r90 = rotar 
 
 r180 :: Dibujo a -> Dibujo a
-r180 x = comp 2 r90 x
+r180 = comp 2 r90 
 
 r270 :: Dibujo a -> Dibujo a
-r270 x = comp 3 r90 x
+r270 = comp 3 r90 
 
 -- una figura repetida con las cuatro rotaciones, superimpuestas.
 encimar4 :: Dibujo a -> Dibujo a
@@ -102,26 +102,32 @@ ciclar :: Dibujo a -> Dibujo a
 ciclar x = cuarteto x (rotar x) (r180 x) (r270 x)
 
 -- map para nuestro lenguaje
--- matcheamos la funcion x con los constructores de dibujo y aplicamos la funcion.
+-- matcheamos la funcion f con los constructores de dibujo y aplicamos la funcion.
 mapDib :: (a -> b) -> Dibujo a -> Dibujo b
-mapDib figura x = x
-mapDib f x = case f of
-    Encimar a b -> Encimar (mapDib f a) (mapDib f b)
-    Apilar a b c d -> Apilar a b (mapDib f c) (mapDib f d)
-    Juntar a b c d -> Juntar a b (mapDib f c) (mapDib f d)
-    Rot45 a -> Rot45 (mapDib f a)
-    Rotar a -> Rotar (mapDib f a)
-    Espejar a -> Espejar (mapDib f a)
+mapDib f (Figura a) = Figura (f a)
+mapDib f (Encimar a b) = Encimar (mapDib f a) (mapDib f b)
+mapDib f (Apilar x y a b) = Apilar x y (mapDib f a) (mapDib f b)
+mapDib f (Juntar x y a b) = Juntar x y (mapDib f a) (mapDib f b)
+mapDib f (Rot45 a) = Rot45 (mapDib f a)
+mapDib f (Rotar a) = Rotar (mapDib f a)
+mapDib f (Espejar a) = Espejar (mapDib f a)
+
 -- verificar que las operaciones satisfagan
 -- 1. map figura = id
 -- 2. map (g . f) = mapDib g . mapDib f
 
 -- Cambiar todas las básicas de acuerdo a la función.
 change :: (a -> Dibujo b) -> Dibujo a -> Dibujo b
-change f x = mapDib f x
+change f (Figura a) = f a
+change f (Encimar a b) = Encimar (change f a) (change f b)
+change f (Apilar x y a b) = Apilar x y (change f a) (change f b)
+change f (Juntar x y a b) = Juntar x y (change f a) (change f b)
+change f (Rot45 a) = Rot45 (change f a)
+change f (Rotar a) = Rotar (change f a)
+change f (Espejar a) = Espejar (change f a)
 
 -- Principio de recursión para Dibujos.
--- matcheamos la funcion x con los constructores de dibujo y aplicamos la funcion.
+-- matcheamos la funcion f con los constructores de dibujo y aplicamos la funcion.
 foldDib ::
   (a -> b) ->
   (b -> b) ->
@@ -132,11 +138,10 @@ foldDib ::
   (b -> b -> b) ->
   Dibujo a ->
   b
-foldDib f g h i j k l x = case x of
-  Figura a -> f a
-  Encimar a b -> j (foldDib f g h i j k l a) (foldDib f g h i j k l b)
-  Apilar a b c d -> k a b (foldDib f g h i j k l c) (foldDib f g h i j k l d)
-  Juntar a b c d -> l a b (foldDib f g h i j k l c) (foldDib f g h i j k l d)
-  Rot45 a -> g (foldDib f g h i j k l a)
-  Rotar a -> h (foldDib f g h i j k l a)
-  Espejar a -> i (foldDib f g h i j k l a)
+foldDib f _ _ _ _ _ _ (Figura a) = f a
+foldDib f g h i j k l (Rot45 a) = g (foldDib f g h i j k l a)
+foldDib f g h i j k l (Espejar a) = h (foldDib f g h i j k l a)
+foldDib f g h i j k l (Rotar a) = i (foldDib f g h i j k l a)
+foldDib f g h i j k l (Apilar x y a b) = j x y (foldDib f g h i j k l a) (foldDib f g h i j k l b)
+foldDib f g h i j k l (Juntar x y a b) = k x y (foldDib f g h i j k l a) (foldDib f g h i j k l b)
+foldDib f g h i j k l (Encimar a b) = l (foldDib f g h i j k l a) (foldDib f g h i j k l b)
