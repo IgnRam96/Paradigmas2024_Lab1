@@ -12,14 +12,14 @@ cambiar pred f = mapDib (\x -> if pred x then f x else x)
 
 -- Alguna básica satisface el predicado.
 anyDib :: Pred a -> Dibujo a -> Bool
-anyDib predic = foldDib predic id id id (\_ _ x y -> (x || b)) (\_ _ x y -> (x || y)) (||)
+anyDib predic = foldDib predic id id id (\_ _ x y -> (x || y)) (\_ _ x y -> (x || y)) (||)
 -- Notar que (||) = \x y = (x||y) {Es unicamente notacion distinta}
 -- \ Nos define una funcion delta
 -- Usamos foldDib para no usar pattern-matching 
 
 -- Todas las básicas satisfacen el predicado.
 allDib :: Pred a -> Dibujo a -> Bool
-allDib predic = foldDib predic id id id (\_ _ x y -> (x && b)) (\_ _ x y -> (x && y)) (&&)
+allDib predic = foldDib predic id id id (\_ _ x y -> (x && y)) (\_ _ x y -> (x && y)) (&&)
 
 -- Los dos predicados se cumplen para el elemento recibido.
 andP :: Pred a -> Pred a -> Pred a
