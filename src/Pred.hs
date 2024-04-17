@@ -3,6 +3,8 @@ module Pred(
   cambiar, anyDib, allDib, orP, andP, falla
 ) where
 
+import Dibujo
+
 type Pred a = a -> Bool
 
 -- Dado un predicado sobre básicas, cambiar todas las que satisfacen

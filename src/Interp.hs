@@ -54,7 +54,7 @@ jun x y f g d w h = ov (f d w' h) (g (d V.+ w') (r' V.* w) (h))
     w' = w V.* r
 
 api :: Float -> Float -> FloatingPic -> FloatingPic -> FloatingPic
-api x y f g d w h = ov (f (d V. + h') w (r V.* h)) (g d w h')
+api x y f g d w h = ov (f (d V.+ h') w (r V.* h)) (g d w h')
   where
     -- r y r' son factores de escalamiento segun los numeros flotantes x e y, y h' es el vector h escalado
     r = x / (x + y)
