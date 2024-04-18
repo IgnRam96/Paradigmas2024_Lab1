@@ -51,7 +51,7 @@ jun x y f g d w h = ov (f d w' h) (g (d V.+ w') (r' V.* w) (h))
     -- r y r' son factores de escalamiento segun los numeros flotantes x e y, y w' es el vector h escalado
     r = x / (x + y)
     r' = y / (x + y)
-    w' = w V.* r
+    w' = r V.* w
 
 api :: Float -> Float -> FloatingPic -> FloatingPic -> FloatingPic
 api x y f g d w h = ov (f (d V.+ h') w (r V.* h)) (g d w h')
@@ -59,7 +59,7 @@ api x y f g d w h = ov (f (d V.+ h') w (r V.* h)) (g d w h')
     -- r y r' son factores de escalamiento segun los numeros flotantes x e y, y h' es el vector h escalado
     r = x / (x + y)
     r' = y / (x + y)
-    h' = h V.* r'
+    h' = r' V.* h
 
 interp :: Output a -> Output (Dibujo a)
-interp f = foldDib f r45 rot esp sup jun api
+interp f = foldDib f r45 rot esp api jun sup

@@ -3,14 +3,14 @@ module Pred(
   cambiar, anyDib, allDib, orP, andP, falla
 ) where
 
-import Dibujo
+import Dibujo(Dibujo, foldDib, figura, change)
 
 type Pred a = a -> Bool
 
 -- Dado un predicado sobre básicas, cambiar todas las que satisfacen
 -- el predicado por la figura básica indicada por el segundo argumento.
 cambiar :: Pred a -> (a -> Dibujo a) -> Dibujo a -> Dibujo a
-cambiar pred f = mapDib (\x -> if pred x then f x else x)
+cambiar pred f = change (\x -> if pred x then f x else figura x)
 
 -- Alguna básica satisface el predicado.
 anyDib :: Pred a -> Dibujo a -> Bool
@@ -31,4 +31,5 @@ andP predic_a predic_b x = (predic_a x) && (predic_b x)
 orP :: Pred a -> Pred a -> Pred a
 orP predic_a predic_b x = (predic_a x) || (predic_b x)
 
--- falla = True
+falla :: Bool
+falla = True
