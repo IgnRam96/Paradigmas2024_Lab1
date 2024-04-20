@@ -1,78 +1,47 @@
 module Dibujos.Grilla where
 
-import Dibujo (Dibujo, figura, juntar, apilar, rotar, encimar, espejar) --rot45
-import FloatingPic(Conf(..), Output) -- half, zero)
-import qualified Graphics.Gloss.Data.Point.Arithmetic as V
-import Graphics.Gloss ( Picture, blue, red, black, yellow,color, line, translate) -- pictures )
-import Graphics.Gloss.Data.Picture (text)
-import Lucid.Svg.Attributes (y1_)
+import Dibujo (Dibujo, figura, juntar, apilar)
+import FloatingPic(Conf(..), Output)
+import Graphics.Gloss (black, color, translate)
+import Graphics.Gloss.Data.Picture (text, scale)
 
--- Les ponemos colorcitos para que no sea _tan_ feo
-data Color = Azul | Rojo | Amarillo | Negro
-    deriving (Show, Eq)
+type Basica = (Int, Int)
 
-data BasicaSinColor = Texto_1 | Texto_2 | Texto_3 | Texto_4
-    deriving (Show, Eq)
-
-type Basica = (BasicaSinColor, Color)
-
-colorear :: Color -> Picture -> Picture
-colorear Azul = color blue
-colorear Rojo = color red
-colorear Amarillo = color yellow
-colorear Negro = color black
-
--- Las coordenadas que usamos son:
---
---  x + y
---  |
---  x --- x + w
---
--- por ahi deban ajustarlas
-interpBasicaSinColor2 :: Output BasicaSinColor
-interpBasicaSinColor2 Texto_1 (x,y) _ _= translate x y (text "1")
-interpBasicaSinColor2 Texto_2 (x,y) _ _= translate x y (text "2")
-interpBasicaSinColor2 Texto_3 (x,y) _ _= translate x y (text "3")
-interpBasicaSinColor2 Texto_4 (x,y) _ _= translate x y (text "4")
+interpBasicaSinColor :: Output Basica
+interpBasicaSinColor (n,m) (x,y) _ _= translate x y (scale 0.2 0.2(text c))
+    where
+        c = "(" ++ show n ++ "," ++ show m ++ ")"
 
 interpBas :: Output Basica
-interpBas (b, c) x y w = colorear c $ interpBasicaSinColor2 b x y w
+interpBas b x y w = color black $ interpBasicaSinColor b x y w
 
-
--- Diferentes tests para ver que estén bien las operaciones
-figRoja :: BasicaSinColor -> Dibujo Basica
-figRoja b = figura (b, Rojo)
-
-figAzul :: BasicaSinColor -> Dibujo Basica
-figAzul b = figura (b, Azul)
-
-figAmar :: BasicaSinColor -> Dibujo Basica
-figAmar b = figura (b, Amarillo)
-
-figNegr :: BasicaSinColor -> Dibujo Basica
-figNegr b = figura (b, Negro)
-
+basCoords :: Int -> Int -> Dibujo Basica
+basCoords n m = figura (n, m)
 
 row :: [Dibujo a] -> Dibujo a
 row [] = error "row: no puede ser vacío"
 row [d] = d
-row (d:ds) = juntar (fromIntegral $ length ds) 1 d (row ds)
+row (d:ds) = juntar 1 (fromIntegral $ length ds) d (row ds)
 
 column :: [Dibujo a] -> Dibujo a
 column [] = error "column: no puede ser vacío"
 column [d] = d
-column (d:ds) = apilar (fromIntegral $ length ds) 1 d (column ds)
+column (d:ds) = apilar 1 (fromIntegral $ length ds) d (column ds)
+
+makeRow:: Int -> Int -> [Dibujo Basica]
+makeRow _ 0 = []
+makeRow n m = makeRow n (m-1) ++ [basCoords n (m-1)]
+
+makeColum:: Int -> Int -> [[Dibujo Basica]]
+makeColum 0 _ = []
+makeColum n m = makeColum (n-1) m ++ [makeRow (n-1) m]
 
 grilla :: [[Dibujo a]] -> Dibujo a
 grilla = column . map row
 
+--Cambiar numeros en makeColum para cambiar numeracion en la grilla
 testAll :: Dibujo Basica
-testAll = grilla [
-    [figRoja Texto_1  , figRoja Texto_2  , figRoja Texto_3  , figRoja Texto_4],
-    [figAzul Texto_1  , figAzul Texto_2  , figAzul Texto_3  , figAzul Texto_4],
-    [figAmar Texto_1  , figAmar Texto_2  , figAmar Texto_3  , figAmar Texto_4],
-    [figNegr Texto_1  , figNegr Texto_2  , figNegr Texto_3  , figNegr Texto_4]
-    ]
+testAll = grilla (makeColum 8 8)
 
 grillaConf :: Conf
 grillaConf = Conf {
