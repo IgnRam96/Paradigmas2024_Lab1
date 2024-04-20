@@ -39,7 +39,7 @@ infixr 7 .-.
 infixr 8 ///
 
 comp :: Int -> (a -> a) -> a -> a
-comp 0 f = f
+comp 1 f = f
 comp n f = f . comp (n-1) f
 -- comp -n f a = error
 
@@ -95,7 +95,7 @@ encimar4 x = (^^^) x ((^^^) (r90 x) ((^^^) (r180 x)(r270 x)))
 
 -- cuatro figuras en un cuadrante.
 cuarteto :: Dibujo a -> Dibujo a -> Dibujo a -> Dibujo a -> Dibujo a
-cuarteto x y z w = (///) ((.-.) x y) ((.-.) z w)
+cuarteto x y z w = (.-.) ((///) x y) ((///) z w)
 
 -- un cuarteto donde se repite la imagen, rotada (¡No confundir con encimar4!)
 ciclar :: Dibujo a -> Dibujo a
