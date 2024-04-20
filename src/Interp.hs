@@ -62,4 +62,4 @@ api x y f g d w h = ov (f (d V.+ h') w (r V.* h)) (g d w h')
     h' = r' V.* h
 
 interp :: Output a -> Output (Dibujo a)
-interp f = foldDib f r45 rot esp api jun sup
+interp f = foldDib f r45 esp rot api jun sup

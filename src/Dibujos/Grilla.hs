@@ -7,13 +7,13 @@ import Graphics.Gloss.Data.Picture (text, scale)
 
 type Basica = (Int, Int)
 
-interpBasicaSinColor :: Output Basica
-interpBasicaSinColor (n,m) (x,y) _ _= translate x y (scale 0.2 0.2(text c))
+interpBasica :: Output Basica
+interpBasica (n,m) (x,y) _ _= translate x y (scale 0.2 0.2(text c))
     where
         c = "(" ++ show n ++ "," ++ show m ++ ")"
 
 interpBas :: Output Basica
-interpBas b x y w = color black $ interpBasicaSinColor b x y w
+interpBas b x y w = color black $ interpBasica b x y w
 
 basCoords :: Int -> Int -> Dibujo Basica
 basCoords n m = figura (n, m)
@@ -40,6 +40,7 @@ grilla :: [[Dibujo a]] -> Dibujo a
 grilla = column . map row
 
 --Cambiar numeros en makeColum para cambiar numeracion en la grilla
+--Si se cambia es recomendable ajustar los valores de scale en interpBasica
 testAll :: Dibujo Basica
 testAll = grilla (makeColum 8 8)
 
