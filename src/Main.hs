@@ -1,10 +1,8 @@
 module Main (main) where
 
--- import Dibujos.Ejemplo (ejemploConf)
 import Dibujos.Feo (feoConf)
 import Dibujos.Grilla (grillaConf)
 import Dibujos.Escher (escherConf)
--- import Dibujos.Cuadrados(cuadConf)
 import FloatingPic (Conf (..))
 import Interp (initial)
 import System.Environment (getArgs)
@@ -12,6 +10,9 @@ import System.Exit (exitFailure, exitSuccess)
 import Control.Monad (when)
 import InterpHaha (ConfH, simpleHaha, initialH')
 import InterpSVG (ConfSVG, initialSVG', simpleSVG)
+import qualified GHC.TypeError as Data
+import Prelude
+import qualified Data.Text.IO as Prelude
 
 -- Lista de configuraciones de los dibujos
 configs :: [Conf]
@@ -38,11 +39,14 @@ main :: IO ()
 main = do
   args <- getArgs
   when (length args > 2 || null args) $ do
-    putStrLn "Sólo puede elegir un dibujo. Para ver los dibujos use -l ."
+    putStrLn "Sólo puede elegir un dibujo. Para ver los dibujos use --lista ."
     exitFailure
-  when (head args == "-l") $ do
+  when (head args == "--lista") $ do
     putStrLn "Los dibujos disponibles son:"
     mapM_ (putStrLn . name) configs
+    putStrLn "\nelija un dibujo:"
+    dibujoEjec <- getLine
+    initial' configs dibujoEjec
     exitSuccess
   when (head args == "-a" && not (null $ tail args)) $ do
     initialH' configsH (args!!1) 
