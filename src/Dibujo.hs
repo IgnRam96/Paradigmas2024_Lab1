@@ -1,4 +1,5 @@
 module Dibujo (Dibujo,
+              comp,
               figura,
               encimar, 
               apilar, 

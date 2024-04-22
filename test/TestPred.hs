@@ -1,5 +1,6 @@
 module Main (main) where
 import Pred
+import Dibujo (figura)
 import Test.HUnit
 
 testPred :: Test
